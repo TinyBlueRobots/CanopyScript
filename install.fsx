@@ -41,6 +41,7 @@ let download source destination =
 let downloadAndUnzip source =
     download source zipFile
     ZipFile.ExtractToDirectory(zipFile, packages)
+    deleteIfExists zipFile
 
 deleteIfExists refs
 deleteIfExists packages
