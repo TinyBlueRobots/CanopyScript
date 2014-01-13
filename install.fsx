@@ -17,9 +17,9 @@ let zipFile = currentDir + "\\zipfile.zip"
 
 let writeRefLine (line : string) =
     use fileWriter = File.AppendText refs
-    fileWriter.WriteLine line   
+    fileWriter.WriteLine line
 
-let startProcess fileName arguments = 
+let startProcess fileName arguments =
     let processStartInfo = ProcessStartInfo(FileName = fileName, Arguments = arguments, UseShellExecute = false, CreateNoWindow = true)
     let pr = Process.Start processStartInfo
     pr.WaitForExit()
@@ -28,17 +28,17 @@ let downloadPackage package =
     printfn "Installing '%s'" package
     startProcess nuget <| sprintf "install %s -ExcludeVersion -OutputDirectory %s" package packages
 
-let deleteIfExists path = 
+let deleteIfExists path =
     printfn "Deleting '%s'" path
     if (Directory.Exists path) then Directory.Delete(path, true) else File.Delete path
 
-let download source destination = 
+let download source destination =
     printfn "Downloading '%s'" source
     use webClient = new WebClient(UseDefaultCredentials = true, Proxy = WebRequest.DefaultWebProxy)
     webClient.Proxy.Credentials <- CredentialCache.DefaultCredentials
     webClient.DownloadFile(source, destination)
 
-let downloadAndUnzip source = 
+let downloadAndUnzip source =
     download source zipFile
     ZipFile.ExtractToDirectory(zipFile, packages)
 
