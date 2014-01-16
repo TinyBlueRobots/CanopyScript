@@ -40,7 +40,9 @@ describe "Check that the first paragraph mentions Jeff Minter"
 quit()
 ```
 
-If you want to organise your scripts into subdirectories, just make sure that you modify the load command to read the refs file from the parent directory e.g. ```#load "..\\refs.fsx"```
+Just save this as an .fsx file and run it. Boom.
+
+If you want to organise your scripts into subdirectories, make sure that you modify the load command to read the refs file from the parent directory e.g. ```#load "..\\refs.fsx"```
 
 Have a look the documentation for all the possible actions and assertions:
 
