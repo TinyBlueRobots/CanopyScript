@@ -49,6 +49,7 @@ deleteIfExists packages
 download "https://nuget.org/nuget.exe" nuget
 downloadPackage "canopy"
 downloadPackage "phantomjs.exe"
+downloadPackage "FSharp.Data"
 deleteIfExists nuget
 
 printfn "Installing 'ChromeDriver'"
