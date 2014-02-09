@@ -63,7 +63,9 @@ let libs = [@"Newtonsoft.Json\lib\net40\Newtonsoft.Json.dll";
             @"Selenium.WebDriver\lib\net40\WebDriver.dll";
             @"Selenium.Support\lib\net40\WebDriver.Support.dll";
             @"SizSelCsZzz\lib\SizSelCsZzz.dll";
-            @"canopy\lib\canopy.dll"]
+            @"canopy\lib\canopy.dll";
+            @"FSharp.Data\lib\net40\FSharp.Data.dll";
+            @"FSharp.Data\lib\net40\FSharp.Data.DesignTime.dll"]
 
 libs |> Seq.map (fun x -> sprintf @"#r @""packages\%s""" x) |> Seq.iter writeRefLine
 
