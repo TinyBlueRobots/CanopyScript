@@ -55,7 +55,6 @@ Create a file called testRunner.fsx:
 ```
 #load "refs.fsx"
 open FSharp.Data
-open canopy
 [<Literal>]
 let path = "testData.csv"
 type Csv = CsvProvider<path>
