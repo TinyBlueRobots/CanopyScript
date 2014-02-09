@@ -47,3 +47,57 @@ If you want to organise your scripts into subdirectories, make sure that you mod
 Have a look the documentation for all the possible actions and assertions:
 
 http://lefthandedgoat.github.io/canopy/
+
+Data Driven Tests
+-----------------
+ 
+Our QAs have to test user journeys after a release using data from a script. It's mind numbing stuff, so here's a little scripting recipe to automate this.
+
+Create a file called testRunner.fsx:
+```
+#load "refs.fsx"
+open FSharp.Data
+open canopy
+[<Literal>]
+let path = "testData.csv"
+type Csv = CsvProvider<path>
+let rows = Csv.Load(path).Data
+#load "test.fsx"
+rows |> Seq.iter test.run
+```
+
+Put your test into another file called test.fsx:
+```
+module test
+#load "refs.fsx"
+open canopy
+
+let run (row:Csv.Row) =
+
+  start chrome
+  
+  describe <| "Go to Google.com and search for " + row.Search
+  url "http://google.com"
+  "input[type=text]" << row.Search
+  press enter
+  
+  describe "Check that the first result is the Wikipedia page"
+  "div.rc h3" == row.Result
+  
+  describe "Follow link to Wikipedia"
+  click "div.rc h3"
+  
+  describe <| "Check that the first paragraph mentions " + row.Assert
+  "p" =~ row.Assert
+  
+  quit()
+```
+
+Put your data into a file called testData.csv:
+```
+Search,Result,Assert
+Attack of the Mutant Camels,"Attack of the Mutant Camels - Wikipedia, the free encyclopedia",Jeff Minter
+Revenge of the Mutant Camels,"Revenge of the Mutant Camels - Wikipedia, the free encyclopedia",Commodore 64
+```
+
+Now execute testRunner.fsx and you'll see your test run for each row of data
