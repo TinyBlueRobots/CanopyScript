@@ -1,5 +1,4 @@
-CanopyScript
-============
+#CanopyScript
 
 Canopy is a web testing framework, written in F#, that allows you to run Selenium tests using concise and simple language. We started using it to enable non-technical QAs to automate their tests and user journeys and it has proved extremely successful. Because it is F#, all you need is the compiler and notepad, and because its syntax is so simple, you don’t need any particular programming skill to get going.
 
@@ -48,8 +47,7 @@ Have a look the documentation for all the possible actions and assertions:
 
 http://lefthandedgoat.github.io/canopy/
 
-Data Driven Tests
------------------
+###Data Driven Tests
  
 Our QAs have to test user journeys after a release using data from a script. It's mind numbing stuff, so here's a little scripting recipe to automate this.
 
