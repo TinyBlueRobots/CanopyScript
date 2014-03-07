@@ -11,8 +11,8 @@ let currentDir = Environment.CurrentDirectory
 let packages = currentDir + "\\packages"
 let nuget = currentDir + "\\nuget.exe"
 let refs = currentDir + "\\refs.fsx"
-let chromeDriverSource = "http://chromedriver.storage.googleapis.com/2.8/chromedriver_win32.zip"
-let ieDriverSource = "https://selenium.googlecode.com/files/IEDriverServer_x64_2.39.0.zip"
+let chromeDriverSource = "http://chromedriver.storage.googleapis.com/2.9/chromedriver_win32.zip"
+let ieDriverSource = "http://selenium-release.storage.googleapis.com/2.40/IEDriverServer_x64_2.40.0.zip"
 let zipFile = currentDir + "\\zipfile.zip"
 
 let writeRefLine (line : string) =
