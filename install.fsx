@@ -67,7 +67,7 @@ let libs = [@"Newtonsoft.Json\lib\net40\Newtonsoft.Json.dll";
             @"FSharp.Data\lib\net40\FSharp.Data.dll";
             @"FSharp.Data\lib\net40\FSharp.Data.DesignTime.dll"]
 
-libs |> Seq.map (fun x -> sprintf @"#r @""packages\%s""" x) |> Seq.iter writeRefLine
+libs |> Seq.map (fun x -> sprintf @"#r @""%s\packages\%s""" currentDir x) |> Seq.iter writeRefLine
 
 writeRefLine "open canopy"
 writeRefLine <| sprintf @"configuration.chromeDir <- @""%s""" packages
