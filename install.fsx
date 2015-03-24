@@ -2,19 +2,23 @@
 #r "System.IO.Compression.dll"
 
 open System
+open System.Diagnostics
 open System.IO
 open System.IO.Compression
 open System.Net
-open System.Diagnostics
+open System.Text.RegularExpressions
 
 let currentDir = Environment.CurrentDirectory
 let packages = currentDir + "\\packages"
-let nuget = currentDir + "\\nuget.exe"
+let paket = currentDir + "\\paket.exe"
 let refs = currentDir + "\\refs.fsx"
 let demo = currentDir + "\\demo.fsx"
-let chromeDriverSource = "http://chromedriver.storage.googleapis.com/2.8/chromedriver_win32.zip"
-let ieDriverSource = "https://selenium.googlecode.com/files/IEDriverServer_x64_2.39.0.zip"
 let zipFile = currentDir + "\\zipfile.zip"
+
+let webClient() = 
+  let webClient = new WebClient(UseDefaultCredentials = true, Proxy = WebRequest.DefaultWebProxy)
+  webClient.Proxy.Credentials <- CredentialCache.DefaultCredentials
+  webClient
 
 let writeFile file (line : string) = 
   use fileWriter = File.AppendText file
@@ -28,7 +32,7 @@ let startProcess fileName arguments =
 
 let downloadPackage package = 
   printfn "Installing '%s'" package
-  startProcess nuget <| sprintf "install %s -ExcludeVersion -OutputDirectory %s" package packages
+  startProcess paket <| sprintf "add nuget %s" package
 
 let deleteIfExists path = 
   printfn "Deleting '%s'" path
@@ -37,26 +41,54 @@ let deleteIfExists path =
 
 let download source destination = 
   printfn "Downloading '%s'" source
-  use webClient = new WebClient(UseDefaultCredentials = true, Proxy = WebRequest.DefaultWebProxy)
-  webClient.Proxy.Credentials <- CredentialCache.DefaultCredentials
-  webClient.DownloadFile(source, destination)
+  webClient().DownloadFile(source, destination)
+
+let downloadPaket() = 
+  let html = webClient().DownloadString "https://github.com/fsprojects/Paket/releases/latest"
+  let paketSource = 
+    Regex.Match(html, "/fsprojects/Paket/releases/download/.*/paket.exe").Value |> sprintf "https://github.com%s"
+  download paketSource paket
+  startProcess paket "init"
 
 let downloadAndUnzip source = 
   download source zipFile
   ZipFile.ExtractToDirectory(zipFile, packages)
   deleteIfExists zipFile
 
+let downloadChromeDriver() = 
+  webClient().DownloadString "http://chromedriver.storage.googleapis.com/LATEST_RELEASE"
+  |> sprintf "http://chromedriver.storage.googleapis.com/%s/chromedriver_win32.zip"
+  |> downloadAndUnzip
+
+let downloadIeDriver() = 
+  let html = webClient().DownloadString "http://selenium-release.storage.googleapis.com/?delimiter=/"
+  
+  let version = 
+    [ for m in Regex.Matches(html, "(?<=\>)[\d\.]+(?=/\<)") do
+        yield m.Value ]
+    |> List.sortBy id
+    |> List.rev
+    |> List.head
+  sprintf "http://selenium-release.storage.googleapis.com/%s/IEDriverServer_x64_%s.0.zip" version version 
+  |> downloadAndUnzip
+
+let deletePaket() = 
+  deleteIfExists paket
+  deleteIfExists "paket.lock"
+  deleteIfExists "paket.dependencies"
+
 deleteIfExists refs
 deleteIfExists demo
 deleteIfExists packages
-download "https://nuget.org/nuget.exe" nuget
+deletePaket()
+downloadPaket()
 downloadPackage "canopy"
 downloadPackage "phantomjs.exe"
-deleteIfExists nuget
+deletePaket()
 printfn "Installing 'ChromeDriver'"
-downloadAndUnzip chromeDriverSource
+downloadChromeDriver()
 printfn "Installing 'IEDriverServer'"
-downloadAndUnzip ieDriverSource
+downloadIeDriver()
 printfn "Creating 'refs.fsx'"
 
 let refsText = sprintf """
@@ -78,6 +110,10 @@ let demoText = sprintf """
 open canopy
 start chrome
 url "http://google.com"
+"input" << "canopy fsharp"
+press enter
+Async.Sleep 5000 |> Async.RunSynchronously
+quit()
 """
 
 writeFile demo demoText
