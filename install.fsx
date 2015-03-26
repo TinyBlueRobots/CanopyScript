@@ -9,11 +9,12 @@ open System.Net
 open System.Text.RegularExpressions
 
 let currentDir = Environment.CurrentDirectory
-let packages = currentDir + "\\packages"
-let paket = currentDir + "\\paket.exe"
-let refs = currentDir + "\\refs.fsx"
-let demo = currentDir + "\\demo.fsx"
-let zipFile = currentDir + "\\zipfile.zip"
+let packages = currentDir + "/packages"
+let paket = currentDir + "/paket.exe"
+let refs = currentDir + "/refs.fsx"
+let demo = currentDir + "/demo.fsx"
+let zipFile = currentDir + "/zipfile.zip"
+let isNix = Environment.OSVersion.Platform = PlatformID.MacOSX || Environment.OSVersion.Platform = PlatformID.Unix
 
 let webClient() = 
   let webClient = new WebClient(UseDefaultCredentials = true, Proxy = WebRequest.DefaultWebProxy)
@@ -25,6 +26,10 @@ let writeFile file (line : string) =
   fileWriter.WriteLine line
 
 let startProcess fileName arguments = 
+  let fileName, arguments = 
+    if isNix then "mono", sprintf "%s %s" fileName arguments
+    else fileName, arguments
+  
   let processStartInfo = 
     ProcessStartInfo(FileName = fileName, Arguments = arguments, UseShellExecute = false, CreateNoWindow = true)
   let pr = Process.Start processStartInfo
@@ -92,23 +97,29 @@ downloadIeDriver()
 printfn "Creating 'refs.fsx'"
 
 let refsText = sprintf """
-#r @"packages\Newtonsoft.Json\lib\net40\Newtonsoft.Json.dll"
-#r @"packages\Selenium.WebDriver\lib\net40\WebDriver.dll"
-#r @"packages\Selenium.Support\lib\net40\WebDriver.Support.dll"
-#r @"packages\SizSelCsZzz\lib\SizSelCsZzz.dll"
-#r @"packages\canopy\lib\canopy.dll"
+#I "packages/Selenium.WebDriver/lib/net40"
+#I "packages/Selenium.Support/lib/net40"
+#r "WebDriver.dll"
+#r "WebDriver.Support.dll"
+#r "packages/Newtonsoft.Json/lib/net40/Newtonsoft.Json.dll"
+#r "packages/SizSelCsZzz/lib/SizSelCsZzz.dll"
+#r "packages/canopy/lib/canopy.dll"
 open canopy
 configuration.chromeDir <- "%s"
 configuration.ieDir <- "%s"
-configuration.phantomJSDir <- @"%s\phantomjs.exe\tools\phantomjs" """ packages packages packages
+configuration.phantomJSDir <- @"%s/phantomjs.exe/tools/phantomjs" """ packages packages packages
 
 writeFile refs refsText
 printfn "Creating 'demo.fsx'"
 
+let firefox = 
+  if isNix then "firefox"
+  else """FirefoxWithPath "/usr/lib/firefox/firefox" """
+
 let demoText = sprintf """
 #load "refs.fsx"
 open canopy
-start chrome
+start %s
 url "http://google.com"
 "input" << "canopy fsharp"
 press enter
@@ -116,5 +127,5 @@ Async.Sleep 5000 |> Async.RunSynchronously
 quit()
 """
 
-writeFile demo demoText
+demoText firefox |> writeFile demo
 printfn "Done"
