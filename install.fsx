@@ -124,7 +124,7 @@ start %s
 url "http://google.com"
 "input" << "canopy fsharp"
 press enter
-Async.Sleep 5000 |> Async.RunSynchronously
+sleep 5000
 quit()
 """
 
