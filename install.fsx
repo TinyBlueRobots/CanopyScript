@@ -113,12 +113,13 @@ writeFile refs refsText
 printfn "Creating 'demo.fsx'"
 
 let firefox = 
-  if isNix then "firefox"
-  else """FirefoxWithPath "/usr/lib/firefox/firefox" """
+  if isNix then """FirefoxWithPath "/usr/lib/firefox/firefox" """
+  else "firefox"
 
 let demoText = sprintf """
 #load "refs.fsx"
 open canopy
+open canopy.types
 start %s
 url "http://google.com"
 "input" << "canopy fsharp"
