@@ -12,7 +12,7 @@ http://go.microsoft.com/fwlink/?LinkId=261286
 
 Then create a directory for your scripts and save this file into it:
 
-https://github.com/JonCanning/CanopyScript/releases/download/release/install.fsx
+https://github.com/TinyBlueRobots/CanopyScript/blob/master/install.fsx
 
 Run this script and it will download canopy and its supporting libraries, and create another file called refs.fsx. You will need to load this file and open the canopy library at the start of your scripts as shown in this sample that carries out a search on Google:
 
