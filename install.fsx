@@ -49,9 +49,7 @@ let download source destination =
   webClient().DownloadFile(source, destination)
 
 let downloadPaket() = 
-  let html = webClient().DownloadString "https://github.com/fsprojects/Paket/releases/latest"
-  let paketSource = 
-    Regex.Match(html, "/fsprojects/Paket/releases/download/.*/paket.exe").Value |> sprintf "https://github.com%s"
+  let paketSource = webClient().DownloadString "http://fsprojects.github.io/Paket/stable"
   download paketSource paket
   startProcess paket "init"
 
